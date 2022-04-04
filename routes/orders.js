@@ -35,4 +35,22 @@ router.post('/', (req, res)=>{
     });
 });
 
+router.put('/:order_id', (req, res) => {
+    mysql.getConnection((err, conn) => {
+        if(err) return res.status(500).send({ error: err });
+        const { order_id } = req.params;
+        const { quantity, product_id } = req.body;
+        conn.query(
+            'UPDATE orders SET quantity = ?, product_id = ? WHERE order_id = ?',
+            [quantity, product_id, order_id],
+            (err, result, fields)=>{
+                if(err) return res.status(500).send({ error: err.sqlMessage });
+                return res.status(201).json({
+                    message: 'Successfull',
+                    product_id
+                })
+            })
+    })
+});
+
 module.exports = router;
