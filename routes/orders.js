@@ -17,6 +17,27 @@ router.get('/', (req, res) => {
     });
 });
 
+router.get('/:order_id', (req, res, next) => {
+    mysql.getConnection((err, conn) => {
+        if(err) { return res.status(500).send({error: err}) }
+        const {order_id} = req.params;
+        conn.query(
+            'SELECT * from orders WHERE orders.order_id = ?',
+            [order_id],
+            (err, results, fields) => {
+                conn.release();
+                if(err) { return res.status(500).send({error: err}) }
+                if(results.length == 0) {
+                    return res.status(500).send({
+                        error: 'Order not found!'
+                    });
+                }
+                return res.status(200).json(results[0]);
+            }
+        );
+    })
+});
+
 router.post('/', (req, res)=>{
     mysql.getConnection((err, conn) => {
         if(err) return res.status(500).send({ error: err });
