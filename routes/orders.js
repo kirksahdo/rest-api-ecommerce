@@ -45,12 +45,28 @@ router.put('/:order_id', (req, res) => {
             [quantity, product_id, order_id],
             (err, result, fields)=>{
                 if(err) return res.status(500).send({ error: err.sqlMessage });
-                return res.status(201).json({
+                return res.status(202).json({
                     message: 'Successfull',
                     product_id
                 })
             })
     })
+});
+
+router.delete('/:order_id', (req, res) => {
+    mysql.getConnection((err, conn) => {
+        if(err) return res.status(500).send({ error: err });
+        const {order_id} = req.params;
+        conn.query(
+            'DELETE FROM orders WHERE order_id = ?',
+            [order_id],
+            (err, results, fields) => {
+                if(err) return res.status(500).send({ error: err });
+                return res.status(202).send({
+                    message: 'Successfull delete!',
+                })
+            });
+    });
 });
 
 module.exports = router;
